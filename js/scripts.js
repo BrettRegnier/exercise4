@@ -7,6 +7,9 @@ window.onload = function () {
 	Main();
 	class ImageBox {
 		constructor(secid, stIdx, galleryid, numImageBoxes) {
+			
+			if (stIdx > picsum.length - 1)
+				stIdx -= picsum.length
 			this.curIdx = stIdx;
 			this.gallery = galleryid;
 			this.numImageBoxes = numImageBoxes;
@@ -88,7 +91,7 @@ window.onload = function () {
 				// Get the next image
 				this.curIdx += this.numImageBoxes;
 				if (this.curIdx > picsum.length - 1)
-					this.curIdx = this.curIdx - (picsum.length + 1);
+					this.curIdx -= picsum.length;
 
 				// change the image
 				var src = urlPic + picsum[this.curIdx].id;
@@ -217,10 +220,11 @@ window.onload = function () {
 	// This randomly selects a box from the list of potential boxes and shows them on the page to make it look random
 	async function BuildBoxes() {
 		var numBoxes = 10
+		var stboxidx = Math.round(Math.random() * (picsum.length - 1));
 		var boxes = [];
 		for (var i = 0; i < numBoxes; i++)
 		{
-			boxes.push(new ImageBox(i, i, "galleryholder", numBoxes));
+			boxes.push(new ImageBox(i, stboxidx++, "galleryholder", numBoxes));
 		}
 
 		var boxesStarting = true;
