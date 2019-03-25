@@ -2,6 +2,7 @@ window.onload = function () {
 
 	// globals
 	var picsum;
+	var urlPic = "https://picsum.photos/300/300?image=";
 
 	Main();
 	class ImageBox {
@@ -12,7 +13,6 @@ window.onload = function () {
 
 			this.active = false;
 			this.IsClicked = false;
-			this.isFading = false;
 
 			this.CraftHTML(secid);
 		}
@@ -49,7 +49,7 @@ window.onload = function () {
 			figimg.classList = "fig__img";
 
 			// create image
-			var src = "https://picsum.photos/300/300?image=" + picsum[this.curIdx].id;
+			var src = urlPic + picsum[this.curIdx].id;
 			var img = document.createElement("img");
 			img.setAttribute("src", src);
 
@@ -105,7 +105,7 @@ window.onload = function () {
 					this.curIdx = this.curIdx - (picsum.length + 1);
 
 				// change the image
-				var src = "https://picsum.photos/300/300?image=" + picsum[this.curIdx].id;
+				var src = urlPic + picsum[this.curIdx].id;
 				this.img.setAttribute("src", src);
 
 				// author
@@ -114,15 +114,13 @@ window.onload = function () {
 				// link
 				this.link.setAttribute("href", picsum[this.curIdx].post_url)
 
-
-				if (this.isFading == false)
-				{
-					this.Fade();
-				}
+				
 			}
 			else {
 				this.fig.style.opacity = "1";
 			}
+
+			return true;
 		}
 
 		Click() {
@@ -132,10 +130,7 @@ window.onload = function () {
 			}
 			else {
 				this.IsClicked = false;
-
-				if (this.isFading == false) {
-					this.Fade();
-				}
+				// this.Fade();
 			}
 			this.fig.classList.toggle("fig--selected");
 		}
@@ -144,10 +139,33 @@ window.onload = function () {
 			return this.active;
 		}
 
+		async Loop() {
+			var completed = true;
+			completed = completed && this.Fade();
+			completed = completed && this.AlterHTML();
+
+
+			while (true)
+			{
+				if (completed == false)
+				{
+					var result = this.Fade();
+					result = result && this.AlterHTML();
+					completed = result;
+					
+				}
+
+				if (completed)
+					completed = false;
+
+				await sleep(500);
+			}
+		}
+		
 		async Begin() {
 			this.active = true;
 			this.isFading = true;
-			this.Fade();
+			this.Loop();
 		}
 
 		async Fade() {
@@ -158,16 +176,14 @@ window.onload = function () {
 				if (this.IsClicked == false) {
 					this.fig.style.opacity = "0";
 					await sleep(2500);
-
-					this.isFading = false;
-					this.AlterHTML();
+					return true;
 				}
-				this.isFading = false;
 			}
 			else {
 				this.fig.style.opacity = "1";
-				this.isFading = false;
 			}
+			
+			
 		}
 	};
 
