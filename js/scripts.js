@@ -28,6 +28,19 @@ window.onload = function () {
 			figure.style.opacity = "0";
 			figure.ImageBox = this;
 			
+			if (Math.round(Math.random()) == 1)
+			{
+				// do right
+				figure.style.right = 0;
+				figure.style.bottom = "";
+			}
+			else
+			{
+				// do bottom
+				figure.style.bottom = 0;
+				figure.style.right = "";
+			}
+			
 			figure.addEventListener("click", function() {
 				figure.ImageBox.Click();
 			});
@@ -76,7 +89,20 @@ window.onload = function () {
 
 		AlterHTML() {
 			if (this.IsClicked == false)
-			{
+			{		
+				
+				if (Math.round(Math.random()) == 1)
+				{
+					// do right
+					this.fig.style.right = 0;
+					this.fig.style.bottom = "";
+				}
+				else
+				{
+					// do bottom
+					this.fig.style.bottom = 0;
+					this.fig.style.right = "";
+				}
 				// Get the next image
 				this.curIdx += this.numImageBoxes;
 				if (this.curIdx > picsum.length - 1)
