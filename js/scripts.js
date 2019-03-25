@@ -29,37 +29,27 @@ window.onload = function () {
 			figure.style.opacity = "0";
 			figure.ImageBox = this;
 
-			if (Math.round(Math.random()) == 1) {
-				// do right
-				figure.style.right = 0;
-				figure.style.bottom = "";
-			}
-			else {
-				// do bottom
-				figure.style.bottom = 0;
-				figure.style.right = "";
-			}
-
+			
 			figure.addEventListener("click", function () {
 				figure.ImageBox.Click();
 			});
-
+			
 			// create wrapper for image
 			var figimg = document.createElement("div");
 			figimg.classList = "fig__img";
-
+			
 			// create image
 			var src = urlPic + picsum[this.curIdx].id;
 			var img = document.createElement("img");
 			img.setAttribute("src", src);
-
+			
 			// place the image into the wrapper
 			figimg.appendChild(img);
-
+			
 			// Create the caption for the figure
 			var cap = document.createElement("figcaption");
 			cap.classList = "fig__cap";
-
+			
 			// Create the author and the link
 			var auth = document.createElement("span");
 			auth.classList = "fig__author";
@@ -68,37 +58,30 @@ window.onload = function () {
 			link.classList = "fig__link";
 			link.setAttribute("href", picsum[this.curIdx].post_url)
 			link.innerText = "Image source";
-
+			
 			cap.appendChild(auth);
 			cap.appendChild(link);
-
+			
 			figure.appendChild(figimg);
 			figure.appendChild(cap);
-
+			
 			sec.appendChild(figure);
 			document.getElementById(this.gallery).appendChild(sec);
-
+			
 			this.img = img;
 			this.author = auth;
 			this.link = link;
-
+			
 			this.fig = figure;
+			this.SetPosition();
 			this.sec = sec
 		}
-
+		
 		AlterHTML() {
 			if (this.IsClicked == false) {
 
-				if (Math.round(Math.random()) == 1) {
-					// do right
-					this.fig.style.right = 0;
-					this.fig.style.bottom = "";
-				}
-				else {
-					// do bottom
-					this.fig.style.bottom = 0;
-					this.fig.style.right = "";
-				}
+				this.SetPosition();
+				
 				// Get the next image
 				this.curIdx += this.numImageBoxes;
 				if (this.curIdx > picsum.length - 1)
@@ -119,8 +102,33 @@ window.onload = function () {
 			else {
 				this.fig.style.opacity = "1";
 			}
-
-			return true;
+		}
+		
+		async SetPosition() {
+			// rightleft
+			var rightleft = Math.random();
+			var stepValue = 50;
+			if (Math.round(rightleft) == 1) {
+				this.fig.style.right = Math.round(rightleft * stepValue) + "px";
+				this.fig.style.left = "";
+			}
+			else {
+				this.fig.style.right = "";
+				this.fig.style.left = Math.round(rightleft * stepValue) + "px";
+			}
+			
+			await sleep(35);
+			
+			// topbottom
+			var topbottom = Math.random();
+			if (Math.round(topbottom) == 1) {
+				this.fig.style.top = Math.round(topbottom * stepValue) + "px";
+				this.fig.style.bottom = "";
+			}
+			else {
+				this.fig.style.top = "";
+				this.fig.style.bottom = Math.round(topbottom * stepValue) + "px";
+			}
 		}
 
 		Click() {
@@ -140,26 +148,19 @@ window.onload = function () {
 		}
 
 		async Loop() {
-			var completed = true;
-			completed = completed && this.Fade();
-			completed = completed && this.AlterHTML();
-
-
+			var first = true;
 			while (true)
 			{
-				if (completed == false)
-				{
-					var result = this.Fade();
-					result = result && this.AlterHTML();
-					completed = result;
+				if (!first)
+					await sleep(6035);
+				else 
+					first = false;
 					
-				}
-
-				if (completed)
-					completed = false;
-
-				await sleep(500);
+				this.Fade();
+				
 			}
+			
+			
 		}
 		
 		async Begin() {
@@ -176,7 +177,7 @@ window.onload = function () {
 				if (this.IsClicked == false) {
 					this.fig.style.opacity = "0";
 					await sleep(2500);
-					return true;
+					this.AlterHTML();
 				}
 			}
 			else {
