@@ -9,9 +9,10 @@ window.onload = function () {
 			this.curIdx = stIdx;
 			this.gallery = galleryid;
 			this.numImageBoxes = numImageBoxes;
-			
+
 			this.active = false;
 			this.IsClicked = false;
+			this.isFading = false;
 
 			this.CraftHTML(secid);
 		}
@@ -27,21 +28,19 @@ window.onload = function () {
 			figure.classList = "fig";
 			figure.style.opacity = "0";
 			figure.ImageBox = this;
-			
-			if (Math.round(Math.random()) == 1)
-			{
+
+			if (Math.round(Math.random()) == 1) {
 				// do right
 				figure.style.right = 0;
 				figure.style.bottom = "";
 			}
-			else
-			{
+			else {
 				// do bottom
 				figure.style.bottom = 0;
 				figure.style.right = "";
 			}
-			
-			figure.addEventListener("click", function() {
+
+			figure.addEventListener("click", function () {
 				figure.ImageBox.Click();
 			});
 
@@ -88,17 +87,14 @@ window.onload = function () {
 		}
 
 		AlterHTML() {
-			if (this.IsClicked == false)
-			{		
-				
-				if (Math.round(Math.random()) == 1)
-				{
+			if (this.IsClicked == false) {
+
+				if (Math.round(Math.random()) == 1) {
 					// do right
 					this.fig.style.right = 0;
 					this.fig.style.bottom = "";
 				}
-				else
-				{
+				else {
 					// do bottom
 					this.fig.style.bottom = 0;
 					this.fig.style.right = "";
@@ -106,66 +102,71 @@ window.onload = function () {
 				// Get the next image
 				this.curIdx += this.numImageBoxes;
 				if (this.curIdx > picsum.length - 1)
-				this.curIdx = this.curIdx - (picsum.length + 1);
-				
+					this.curIdx = this.curIdx - (picsum.length + 1);
+
 				// change the image
 				var src = "https://picsum.photos/300/300?image=" + picsum[this.curIdx].id;
 				this.img.setAttribute("src", src);
-				
+
 				// author
 				this.author.innerText = "Author: " + picsum[this.curIdx].author;
-				
+
 				// link
 				this.link.setAttribute("href", picsum[this.curIdx].post_url)
-				
-				
-				this.Fade();
+
+
+				if (this.isFading == false)
+				{
+					this.Fade();
+				}
 			}
-			else
-			{
+			else {
 				this.fig.style.opacity = "1";
 			}
 		}
 
 		Click() {
-			if (this.IsClicked == false)
-			{
+			if (this.IsClicked == false) {
 				this.IsClicked = true;
 				this.fig.style.opacity = "1";
 			}
-			else
-			{
+			else {
 				this.IsClicked = false;
-				this.Fade();
+
+				if (this.isFading == false) {
+					this.Fade();
+				}
 			}
 			this.fig.classList.toggle("fig--selected");
 		}
-		
+
 		IsActive() {
 			return this.active;
 		}
 
 		async Begin() {
 			this.active = true;
+			this.isFading = true;
 			this.Fade();
 		}
-		
+
 		async Fade() {
-			if (this.IsClicked == false)
-			{	
+			if (this.IsClicked == false) {
 				await sleep(500);
 				this.fig.style.opacity = "1";
 				await sleep(3000);
-				if (this.IsClicked == false)
-				{
+				if (this.IsClicked == false) {
 					this.fig.style.opacity = "0";
 					await sleep(2500);
+
+					this.isFading = false;
 					this.AlterHTML();
 				}
+				this.isFading = false;
 			}
-			else
-			{
+			else {
 				this.fig.style.opacity = "1";
+				this.isFading = false;
 			}
 		}
 	};
@@ -173,42 +174,36 @@ window.onload = function () {
 	function sleep(ms) {
 		return new Promise(resolve => setTimeout(resolve, ms));
 	}
-	
+
 	// https://love2dev.com/blog/javascript-remove-from-array/
 	// Got it here.
 	function RemoveFromArray(arr, cond) {
-	   return arr.filter(function(ele){
-		   return ele != cond;
-	   });
-	
+		return arr.filter(function (ele) {
+			return ele != cond;
+		});
+
 	}
-	
-	async function BuildBoxes()
-	{
+
+	async function BuildBoxes() {
 		var numBoxes = 10
 		var boxes = [];
-		for (var i = 0; i < numBoxes; i++)
-		{
+		for (var i = 0; i < numBoxes; i++) {
 			boxes.push(new ImageBox(i, i, "galleryholder", numBoxes));
-		}	
-		
+		}
+
 		var boxesStarting = true;
 		var tmp = boxes;
-		while (boxesStarting)
-		{
-			if (tmp.length != 0)
-			{
-				
-				var idx = Math.round(Math.random() * tmp.length); 
-				if (tmp[idx] != null && tmp[idx].IsActive() == false)
-				{
+		while (boxesStarting) {
+			if (tmp.length != 0) {
+
+				var idx = Math.round(Math.random() * tmp.length);
+				if (tmp[idx] != null && tmp[idx].IsActive() == false) {
 					tmp[idx].Begin();
 					tmp = RemoveFromArray(tmp, idx);
 				}
 				await sleep(100);
 			}
-			else
-			{
+			else {
 				boxesStarting = false
 			}
 		}
@@ -223,8 +218,7 @@ window.onload = function () {
 		xhr.send(null);
 
 		xhr.onload = function () {
-			if (xhr.status == 200)
-			{
+			if (xhr.status == 200) {
 				picsum = JSON.parse(xhr.responseText);
 				BuildBoxes();
 			}

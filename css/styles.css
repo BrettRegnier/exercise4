@@ -29,7 +29,6 @@ body {
 	transition: opacity 2000ms ease-in-out, border 200ms ease-in-out;
 	cursor: grabbing;
 	border: 1px solid transparent;
-	border-bottom: 1px solid black;
 	
 }
 
