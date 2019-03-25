@@ -147,6 +147,46 @@ window.onload = function () {
 	function sleep(ms) {
 		return new Promise(resolve => setTimeout(resolve, ms));
 	}
+	
+	// https://love2dev.com/blog/javascript-remove-from-array/
+	// Got it here.
+	function RemoveFromArray(arr, cond) {
+	   return arr.filter(function(ele){
+		   return ele != cond;
+	   });
+	
+	}
+	
+	async function BuildBoxes()
+	{
+		var numBoxes = 10
+		var boxes = [];
+		for (var i = 0; i < numBoxes; i++)
+		{
+			boxes.push(new ImageBox(i, i, "galleryholder", numBoxes));
+		}	
+		
+		var boxesStarting = true;
+		var tmp = boxes;
+		while (boxesStarting)
+		{
+			if (tmp.length != 0)
+			{
+				
+				var idx = Math.round(Math.random() * tmp.length); 
+				if (tmp[idx] != null && tmp[idx].IsActive() == false)
+				{
+					tmp[idx].Begin();
+					tmp = RemoveFromArray(tmp, idx);
+				}
+				await sleep(100);
+			}
+			else
+			{
+				boxesStarting = false
+			}
+		}
+	}
 
 	function Main() {
 
@@ -160,6 +200,7 @@ window.onload = function () {
 			if (xhr.status == 200)
 			{
 				picsum = JSON.parse(xhr.responseText);
+				BuildBoxes();
 			}
 		};
 	}
