@@ -13,6 +13,7 @@ window.onload = function () {
 
 			this.active = false;
 			this.IsClicked = false;
+			this.variableSleep = 0;
 
 			this.CraftHTML(secid);
 		}
@@ -28,28 +29,26 @@ window.onload = function () {
 			figure.classList = "fig";
 			figure.style.opacity = "0";
 			figure.ImageBox = this;
-
-			
 			figure.addEventListener("click", function () {
 				figure.ImageBox.Click();
 			});
-			
+
 			// create wrapper for image
 			var figimg = document.createElement("div");
 			figimg.classList = "fig__img";
-			
+
 			// create image
 			var src = urlPic + picsum[this.curIdx].id;
 			var img = document.createElement("img");
 			img.setAttribute("src", src);
-			
+
 			// place the image into the wrapper
 			figimg.appendChild(img);
-			
+
 			// Create the caption for the figure
 			var cap = document.createElement("figcaption");
 			cap.classList = "fig__cap";
-			
+
 			// Create the author and the link
 			var auth = document.createElement("span");
 			auth.classList = "fig__author";
@@ -59,29 +58,33 @@ window.onload = function () {
 			link.setAttribute("href", picsum[this.curIdx].post_url)
 			link.innerText = "Image source";
 			
+			// Append all elements
 			cap.appendChild(auth);
 			cap.appendChild(link);
-			
+
 			figure.appendChild(figimg);
 			figure.appendChild(cap);
-			
+
 			sec.appendChild(figure);
 			document.getElementById(this.gallery).appendChild(sec);
-			
+
+			// Add the images to the object
 			this.img = img;
 			this.author = auth;
 			this.link = link;
-			
-			this.fig = figure;
-			this.SetPosition();
-			this.sec = sec
-		}
-		
-		AlterHTML() {
-			if (this.IsClicked == false) {
 
+			this.fig = figure;
+			this.sec = sec
+			
+			// finally set the position
+			this.SetPosition();
+		}
+
+		AlterHTML() {
+			if (this.IsClicked == false)
+			{
 				this.SetPosition();
-				
+
 				// Get the next image
 				this.curIdx += this.numImageBoxes;
 				if (this.curIdx > picsum.length - 1)
@@ -96,49 +99,54 @@ window.onload = function () {
 
 				// link
 				this.link.setAttribute("href", picsum[this.curIdx].post_url)
-
-				
 			}
-			else {
+			else
+			{
 				this.fig.style.opacity = "1";
 			}
 		}
-		
+
+		// set the position in a variable positioning to add more random like style
 		async SetPosition() {
 			// rightleft
 			var rightleft = Math.random();
-			var stepValue = 50;
-			if (Math.round(rightleft) == 1) {
+			var stepValue = 25;
+			if (Math.round(rightleft) == 1)
+			{
 				this.fig.style.right = Math.round(rightleft * stepValue) + "px";
 				this.fig.style.left = "";
 			}
-			else {
+			else
+			{
 				this.fig.style.right = "";
 				this.fig.style.left = Math.round(rightleft * stepValue) + "px";
 			}
-			
+
 			await sleep(35);
-			
+
 			// topbottom
 			var topbottom = Math.random();
-			if (Math.round(topbottom) == 1) {
+			if (Math.round(topbottom) == 1)
+			{
 				this.fig.style.top = Math.round(topbottom * stepValue) + "px";
 				this.fig.style.bottom = "";
 			}
-			else {
+			else
+			{
 				this.fig.style.top = "";
 				this.fig.style.bottom = Math.round(topbottom * stepValue) + "px";
 			}
 		}
 
 		Click() {
-			if (this.IsClicked == false) {
+			if (this.IsClicked == false)
+			{
 				this.IsClicked = true;
 				this.fig.style.opacity = "1";
 			}
-			else {
+			else
+			{
 				this.IsClicked = false;
-				// this.Fade();
 			}
 			this.fig.classList.toggle("fig--selected");
 		}
@@ -147,22 +155,21 @@ window.onload = function () {
 			return this.active;
 		}
 
+		// Forever loop through pictures
 		async Loop() {
 			var first = true;
 			while (true)
 			{
+				// sleeps based on the random showing time that is in the fade function
 				if (!first)
-					await sleep(6035);
-				else 
+					await sleep(6035 + this.variableSleep);
+				else
 					first = false;
-					
 				this.Fade();
-				
 			}
-			
-			
 		}
-		
+
+		// start the animation sequence
 		async Begin() {
 			this.active = true;
 			this.isFading = true;
@@ -170,21 +177,27 @@ window.onload = function () {
 		}
 
 		async Fade() {
-			if (this.IsClicked == false) {
+			if (this.IsClicked == false)
+			{
+				// doing fading effect while the image is not clicked
 				await sleep(500);
 				this.fig.style.opacity = "1";
-				await sleep(3000);
-				if (this.IsClicked == false) {
+
+				this.variableSleep = Math.round(Math.random() * 50);
+				await sleep(3000 + this.variableSleep);
+
+				if (this.IsClicked == false)
+				{
 					this.fig.style.opacity = "0";
 					await sleep(2500);
 					this.AlterHTML();
 				}
 			}
-			else {
+			else
+			{
+				// if the image is clicked bring to opacity to 1
 				this.fig.style.opacity = "1";
 			}
-			
-			
 		}
 	};
 
@@ -201,26 +214,34 @@ window.onload = function () {
 
 	}
 
+	// This randomly selects a box from the list of potential boxes and shows them on the page to make it look random
 	async function BuildBoxes() {
 		var numBoxes = 10
 		var boxes = [];
-		for (var i = 0; i < numBoxes; i++) {
+		for (var i = 0; i < numBoxes; i++)
+		{
 			boxes.push(new ImageBox(i, i, "galleryholder", numBoxes));
 		}
 
 		var boxesStarting = true;
 		var tmp = boxes;
-		while (boxesStarting) {
-			if (tmp.length != 0) {
-
+		while (boxesStarting)
+		{
+			if (tmp.length != 0)
+			{
+				// picks a random idx in the remaining boxes
 				var idx = Math.round(Math.random() * tmp.length);
-				if (tmp[idx] != null && tmp[idx].IsActive() == false) {
+				if (tmp[idx] != null && tmp[idx].IsActive() == false)
+				{
 					tmp[idx].Begin();
 					tmp = RemoveFromArray(tmp, idx);
 				}
+				// sleep to give them a nice presence of appearing at different moments.
 				await sleep(100);
 			}
-			else {
+			else
+			{
+				// end the loop
 				boxesStarting = false
 			}
 		}
@@ -235,7 +256,8 @@ window.onload = function () {
 		xhr.send(null);
 
 		xhr.onload = function () {
-			if (xhr.status == 200) {
+			if (xhr.status == 200)
+			{
 				picsum = JSON.parse(xhr.responseText);
 				BuildBoxes();
 			}
